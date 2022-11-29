@@ -1,0 +1,19 @@
+.signup {
+    height: 100vh;
+}
+
+.form {
+    height: 30vh;
+
+    display: block;
+    justify-content: center;
+    align-items: center;
+}
+
+.signin {
+    height: 30vh;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}

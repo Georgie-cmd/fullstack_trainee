@@ -1,0 +1,19 @@
+.main {
+    height: 100vh;
+}
+
+.form {
+    height: 30vh;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.signup {
+    /* height: 40vh; */
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
