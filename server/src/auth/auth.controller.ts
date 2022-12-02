@@ -25,7 +25,7 @@ export class AuthController {
     }
 
     @Get('/refresh-token')
-    @UseGuards(AuthGuard('refresh'))
+    @UseGuards(AuthGuard('refresh')) //USE GUARDS FOR PROTECTING (CHECKING ACCESS TOKEN)
     async refreshTokens(@Req() req: any, @Res({ passthrough: true }) res: Response) {
         const token = await this.tokenService.getJwtToken(req.user as CurrentUser)
         const refreshToken = await this.tokenService.getRefreshToken(req.user.id)
@@ -42,8 +42,14 @@ export class AuthController {
 
     
     @Post('/registration') 
-    async registration(@Body() registerDto: RegisterUserDto, registerDetailsDto: RegisterDetailsDto) {
+    async registration(
+        @Req() req: any, @Res({ passthrough: true }) res: Response,
+        @Body() registerDto: RegisterUserDto, registerDetailsDto: RegisterDetailsDto
+    ) {
         await this.authService.registration(registerDto, registerDetailsDto)
+        //CREATE AN ACCESS TOKEN FOR REDIRECTING
+        
+        res.redirect('/refresh-token') //REDIRECT - TO MAKE A REFRESH TOKEN
     }
 
     @Post('/')
@@ -57,7 +63,7 @@ export class AuthController {
             refresh_token: refresh_token
         }
 
-        res.cookie('auth-cookie', secretData, { httpOnly: true })
+        res.cookie('auth-cookie', secretData, {httpOnly: true})
         
         return secretData
     }
