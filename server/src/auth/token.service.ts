@@ -32,17 +32,17 @@ export class TokenService {
         /* Refresh Token */
     async getRefreshToken(id: string): Promise<string> {
         const userDataToUpdate = {
-            refresh_roken: randomToken.generate(20),
+            refresh_token: randomToken.generate(20),
             refresh_token_exp: moment().day(62).format('YYYY/MM/DD'),
         }
 
         await this.tokenRepository.update({
-            refresh_token: userDataToUpdate.refresh_roken,
+            refresh_token: userDataToUpdate.refresh_token,
             refresh_token_exp: userDataToUpdate.refresh_token_exp,
             ip_address: (await ipify.ipv4()).toString()
         }, {where: {id: id}})
 
-        return userDataToUpdate.refresh_roken
+        return userDataToUpdate.refresh_token
     }
 
         /* Refresh Token's validation */
