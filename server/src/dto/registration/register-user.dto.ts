@@ -2,7 +2,7 @@ import { IsEmail, IsString, Matches, MaxLength, MinLength } from "class-validato
 import { Match } from "src/decorators/match.decorator"
 
 export class RegisterUserDto {
-    id: number
+    id: string
     
     @IsString({message: 'Field \'First Name\' must include only letters...'})
     @MinLength(2, {message: 'Field \'First Name\' should be at least 2 charachters...'})

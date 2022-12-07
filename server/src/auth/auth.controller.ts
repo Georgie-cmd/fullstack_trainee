@@ -1,8 +1,7 @@
-import { Body, Controller, Get, Post, Req, Res, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Post, Redirect, Req, Res, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { Response } from 'express';
 import { CurrentUser } from 'src/dto/current-user.dto';
-import { RegisterDetailsDto } from 'src/dto/registration/register-details.dto';
 import { RegisterUserDto } from 'src/dto/registration/register-user.dto';
 import { AuthService } from './auth.service';
 import { TokenService } from './token.service';
@@ -25,7 +24,7 @@ export class AuthController {
     }
 
     @Get('/refresh-token')
-    @UseGuards(AuthGuard('refresh')) //USE GUARDS FOR PROTECTING (CHECKING ACCESS TOKEN)
+    @UseGuards(AuthGuard('refresh'))
     async refreshTokens(@Req() req: any, @Res({ passthrough: true }) res: Response) {
         const token = await this.tokenService.getJwtToken(req.user as CurrentUser)
         const refreshToken = await this.tokenService.getRefreshToken(req.user.id)
@@ -44,12 +43,18 @@ export class AuthController {
     @Post('/registration') 
     async registration(
         @Req() req: any, @Res({ passthrough: true }) res: Response,
-        @Body() registerDto: RegisterUserDto, registerDetailsDto: RegisterDetailsDto
+        @Body() registerDto: RegisterUserDto
     ) {
-        await this.authService.registration(registerDto, registerDetailsDto)
-        //CREATE AN ACCESS TOKEN FOR REDIRECTING
-        
-        res.redirect('/refresh-token') //REDIRECT - TO MAKE A REFRESH TOKEN
+        const user = await this.authService.registration(registerDto)
+        const token = await this.tokenService.getJwtRegToken(user)
+
+        const secretData = {
+            token
+        }
+
+        res.cookie('auth-cookie', secretData, {httpOnly: true})
+
+        return {user, ...secretData}
     }
 
     @Post('/')

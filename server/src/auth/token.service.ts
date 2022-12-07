@@ -6,15 +6,20 @@ import * as moment from 'moment';
 import { InjectModel } from "@nestjs/sequelize";
 import { Token } from "src/database/token.model";
 import { User } from "src/database/user.model";
+import { UsersService } from "src/users/users.service";
+import { RegisterUserDto } from "src/dto/registration/register-user.dto";
+import { CreateUserDetails } from "src/dto/creating/create-details.dto";
 
 
 
 export class TokenService {
     constructor(
         private JwtService: JwtService,
+        private userService: UsersService,
         @InjectModel(Token) private tokenRepository: typeof Token,
         @InjectModel(User) private userRepository: typeof User
     ) {}
+
 
 
         /* JWT  */
@@ -27,10 +32,38 @@ export class TokenService {
         return this.JwtService.signAsync(payload)
     }
 
-        /* Refresh Token */
-    async getRefreshToken(id: number): Promise<string> {
+
+        /* JWT Reg Token */
+    async getJwtRegToken(registerDto: RegisterUserDto): Promise<string> {
+        let payload = {
+            id: registerDto.id,
+            email: registerDto.email
+        }
+
+        return this.JwtService.signAsync(payload)
+    }
+
+    
+    async getRefreshRegToken(id: string): Promise<string> {
+        const userDataToCreate= {
+            refresh_token: randomToken.generate(40),
+            refresh_token_exp: moment().day(62).format('YYYY/MM/DD'),
+        }
+
+        await this.tokenRepository.create({
+            refresh_token: userDataToCreate.refresh_token,
+            refresh_token_exp: userDataToCreate.refresh_token_exp,
+            ip_address: (await ipify.ipv4()).toString()
+        }, {where: {id: id}}) // IN DEVELOPMENT STAGE
+
+        return userDataToCreate.refresh_token
+    }
+
+
+        /* Refresh Token for login*/
+    async getRefreshToken(id: string): Promise<string> {
         const userDataToUpdate = {
-            refresh_token: randomToken.generate(20),
+            refresh_token: randomToken.generate(40),
             refresh_token_exp: moment().day(62).format('YYYY/MM/DD'),
         }
 
@@ -42,6 +75,7 @@ export class TokenService {
 
         return userDataToUpdate.refresh_token
     }
+
 
         /* Refresh Token's validation */
     async validateRefreshToken(email: string, refresh_roken: string): Promise<CurrentUser> {
