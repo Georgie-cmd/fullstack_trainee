@@ -1,5 +1,4 @@
 export class CreateUserDto {
-    id: string
     first_name: string
     last_name: string
     role_in_company: string

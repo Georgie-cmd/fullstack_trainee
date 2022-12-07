@@ -1,5 +1,5 @@
 export class CurrentUser {
-    id: string
+    id: number
     first_name: string
     last_name: string
     role_in_company: string

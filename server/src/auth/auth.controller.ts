@@ -1,6 +1,6 @@
 import { Body, Controller, Get, Post, Redirect, Req, Res, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { Response } from 'express';
+import { Response, Request } from 'express';
 import { CurrentUser } from 'src/dto/current-user.dto';
 import { RegisterUserDto } from 'src/dto/registration/register-user.dto';
 import { AuthService } from './auth.service';
@@ -14,14 +14,32 @@ export class AuthController {
         private authService: AuthService,
         private tokenService: TokenService 
     ) {}
-
+    
 
 
     @Get('/authenctification')
-    @UseGuards(AuthGuard('jwt'))
+    @UseGuards(AuthGuard('refresh'))
     async auth(@Req() req: any) {
         return ['Hello', 'World!']
     }
+
+
+    @Get('/reg-refresh-token')
+    @Redirect('/authenctification', 301)
+    @UseGuards(AuthGuard('access'))
+    async refreshToken(@Req() req: any, @Res({ passthrough: true }) res: Response) {
+        const token = await this.tokenService.getRefreshRegToken(req.user.id)
+
+        const secretData = {
+            token
+        }
+
+        res.clearCookie('access-cookie')
+        res.cookie('auth-cookie', secretData, {httpOnly: true})
+
+        return {...secretData}
+    }
+
 
     @Get('/refresh-token')
     @UseGuards(AuthGuard('refresh'))
@@ -39,8 +57,11 @@ export class AuthController {
         return { msg: 'success' }
     }
 
+
+
     
     @Post('/registration') 
+    @Redirect('/reg-refresh-token', 301)
     async registration(
         @Req() req: any, @Res({ passthrough: true }) res: Response,
         @Body() registerDto: RegisterUserDto
@@ -52,7 +73,7 @@ export class AuthController {
             token
         }
 
-        res.cookie('auth-cookie', secretData, {httpOnly: true})
+        res.cookie('access-cookie', secretData, {httpOnly: true})
 
         return {user, ...secretData}
     }

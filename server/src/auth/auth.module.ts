@@ -12,6 +12,7 @@ import { TokenService } from './token.service';
 import { JwtStrategyService } from './strategies/jwt-strategy/jwt-strategy.service';
 import { LocalStrategyService } from './strategies/local-strategy/local-strategy.service';
 import { RefreshStrategyService } from './strategies/refresh-strategy/refresh-strategy.service';
+import { AccessJwtStrategy } from './strategies/jwt-strategy/access-jwt-strategy.service';
 
 
 
@@ -36,7 +37,8 @@ import { RefreshStrategyService } from './strategies/refresh-strategy/refresh-st
     TokenService,
     JwtStrategyService,
     LocalStrategyService,
-    RefreshStrategyService
+    RefreshStrategyService,
+    AccessJwtStrategy
   ],
   controllers: [AuthController],
   exports: [
@@ -44,7 +46,8 @@ import { RefreshStrategyService } from './strategies/refresh-strategy/refresh-st
     TokenService,
     JwtStrategyService,
     LocalStrategyService,
-    RefreshStrategyService
+    RefreshStrategyService,
+    AccessJwtStrategy
   ]
 })
 

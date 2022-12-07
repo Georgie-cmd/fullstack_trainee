@@ -6,10 +6,9 @@ import { CurrentUser } from 'src/dto/current-user.dto';
 
 
 
-
 @Injectable()
 export class AuthService {
-    constructor(
+    constructor( 
         private userService: UsersService
     ) {}
 
@@ -31,6 +30,10 @@ export class AuthService {
             })
         }
     }
+
+
+
+
 
 
     async userValidation(email: string, password: string): Promise<CurrentUser> {

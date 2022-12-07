@@ -15,7 +15,6 @@ import { CreateUserDetails } from "src/dto/creating/create-details.dto";
 export class TokenService {
     constructor(
         private JwtService: JwtService,
-        private userService: UsersService,
         @InjectModel(Token) private tokenRepository: typeof Token,
         @InjectModel(User) private userRepository: typeof User
     ) {}
@@ -34,34 +33,36 @@ export class TokenService {
 
 
         /* JWT Reg Token */
-    async getJwtRegToken(registerDto: RegisterUserDto): Promise<string> {
+    async getJwtRegToken(userModel: User): Promise<string> {
         let payload = {
-            id: registerDto.id,
-            email: registerDto.email
+            id: userModel.id,
+            first_name: userModel.first_name,
+            role_in_company: userModel.role_in_company,
+            email: userModel.email
         }
 
         return this.JwtService.signAsync(payload)
     }
 
-    
-    async getRefreshRegToken(id: string): Promise<string> {
-        const userDataToCreate= {
+
+        /* Refresh Token for registration */
+    async getRefreshRegToken(id: number) {
+        const userDataToCreate = {
             refresh_token: randomToken.generate(40),
             refresh_token_exp: moment().day(62).format('YYYY/MM/DD'),
         }
 
-        await this.tokenRepository.create({
+        return await this.tokenRepository.upsert({
+            userId: id,
             refresh_token: userDataToCreate.refresh_token,
-            refresh_token_exp: userDataToCreate.refresh_token_exp,
+            refresh_token_exp: moment().day(62).format('YYYY/MM/DD'),
             ip_address: (await ipify.ipv4()).toString()
-        }, {where: {id: id}}) // IN DEVELOPMENT STAGE
-
-        return userDataToCreate.refresh_token
+        })
     }
 
 
         /* Refresh Token for login*/
-    async getRefreshToken(id: string): Promise<string> {
+    async getRefreshToken(id: number): Promise<string> {
         const userDataToUpdate = {
             refresh_token: randomToken.generate(40),
             refresh_token_exp: moment().day(62).format('YYYY/MM/DD'),

@@ -1,9 +1,9 @@
 import { IsEmail, IsString, Matches, MaxLength, MinLength } from "class-validator"
 import { Match } from "src/decorators/match.decorator"
 
+
+
 export class RegisterUserDto {
-    id: string
-    
     @IsString({message: 'Field \'First Name\' must include only letters...'})
     @MinLength(2, {message: 'Field \'First Name\' should be at least 2 charachters...'})
     @MaxLength(18, {message: 'Field \'First Name\' can not be more than 18 characters...'})
