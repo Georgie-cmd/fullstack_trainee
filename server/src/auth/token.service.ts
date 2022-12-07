@@ -46,7 +46,7 @@ export class TokenService {
 
 
         /* Refresh Token for registration */
-    async getRefreshRegToken(id: number) {
+    async getRefreshRegToken(id: string) {
         const userDataToCreate = {
             refresh_token: randomToken.generate(40),
             refresh_token_exp: moment().day(62).format('YYYY/MM/DD'),
